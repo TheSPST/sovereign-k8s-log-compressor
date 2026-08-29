@@ -39,7 +39,7 @@ def compress_file(file_path):
             
         if res_data.get('status') == 'success':
             download_url = f"{SOVEREIGN_API_URL}{res_data['download_url']}"
-            out_compressed_path = f"{file_path}.sov"
+            out_compressed_path = f"{file_path}.spst"
             urllib.request.urlretrieve(download_url, out_compressed_path)
             orig_size = len(file_bytes)
             new_size = os.path.getsize(out_compressed_path)
