@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sovereign-log-slasher
+  namespace: kube-system
+  labels:
+    app: sovereign-log-slasher
+spec:
+  selector:
+    matchLabels:
+      app: sovereign-log-slasher
+  template:
+    metadata:
+      labels:
+        app: sovereign-log-slasher
+    spec:
+      containers:
+      - name: sovereign-agent
+        image: python:3.11-alpine
+        command: ["python", "/app/sidecar.py"]
+        env:
+        - name: SOVEREIGN_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sovereign-credentials
+              key: api-key
+        - name: SOVEREIGN_API_URL
+          value: "https://a3pme2hx4v.us-east-1.awsapprunner.com"
+        - name: LOG_DIR
+          value: "/var/log/pods"
+        volumeMounts:
+        - name: pod-logs
+          mountPath: /var/log/pods
+        - name: app-code
+          mountPath: /app
+      volumes:
+      - name: pod-logs
+        hostPath:
+          path: /var/log/pods
+      - name: app-code
+        configMap:
+          name: sovereign-sidecar-code
